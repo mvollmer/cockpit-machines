@@ -39,6 +39,7 @@ const VMS_CONFIG = {
     },
 
     StorageMigrationSupported: true,
+    ForceExternalSnapshots: false,
 };
 
 function try_fields(dict, fields, def) {
