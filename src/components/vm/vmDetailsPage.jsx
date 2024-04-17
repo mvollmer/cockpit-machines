@@ -45,6 +45,8 @@ import VmActions from './vmActions.jsx';
 import { VmNeedsShutdown } from '../common/needsShutdown.jsx';
 import { VmUsesSpice } from './usesSpice.jsx';
 
+import VMS_CONFIG from "../../config.js";
+
 import './vmDetailsPage.scss';
 
 const _ = cockpit.gettext;
@@ -170,7 +172,7 @@ export const VmDetailsPage = ({
             body: <VmHostDevCard vm={vm} nodeDevices={nodeDevices} />,
         }
     ];
-    if (vm.snapshots !== -1 && vm.snapshots !== undefined) {
+    if (VMS_CONFIG.SnapshotsSupported && vm.snapshots !== -1 && vm.snapshots !== undefined) {
         cardContents.push({
             id: cockpit.format("$0-snapshots", vmId(vm.name)),
             className: "snapshots-card",
