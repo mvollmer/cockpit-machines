@@ -881,7 +881,7 @@ export function getStoragePoolPath(storagePools, poolName, connectionName) {
 }
 
 export function vmSupportsExternalSnapshots(config, vm, storagePools) {
-    // External snapshot should only be used if the VM's os types/architecture allow it
+    // External snapshot should be used if the VM's os types/architecture allow it
     // and if snapshot features are present among guest capabilities:
     // https://libvirt.org/formatcaps.html#guest-capabilities
     if (!config.capabilities?.guests.some(guest => guest.osType === vm.osType &&
@@ -899,11 +899,11 @@ export function vmSupportsExternalSnapshots(config, vm, storagePools) {
         return false;
     }
 
-    // Currently external snapshots work only for disks of type "file"
-    if (!disks.every(disk => disk.type === "file")) {
-        logDebug(`vmSupportsExternalSnapshots: vm ${vm.name} has unsupported disk type`);
-        return false;
-    }
+    // Otherwise we make external snapshots since they are preferred
+    // by libvirt. There are cases where external snapshots don't work
+    // yet (such as with disks in a pool), but we let libvirt do the
+    // talking via its error messages and hope those cases will go
+    // away.
 
     return true;
 }

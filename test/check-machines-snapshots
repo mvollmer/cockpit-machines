@@ -308,7 +308,7 @@ class TestMachinesSnapshots(machineslib.VirtualMachinesCase):
         m.execute("virsh snapshot-delete subVmTest1 test_snap_1")
 
         # With disk in a pool.
-        # This will make a internal snapshot.
+        # This will fail to make an external snapshot.
 
         p1 = os.path.join(self.vm_tmpdir, "vm_one")
         m.execute(f"mkdir --mode 777 {p1}")
