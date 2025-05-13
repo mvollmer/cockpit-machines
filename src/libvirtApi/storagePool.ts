@@ -30,7 +30,7 @@ import type {
 } from '../types';
 
 import { updateOrAddStoragePool } from '../actions/store-actions.js';
-import { getPoolXML } from '../libvirt-xml-create.js';
+import { getPoolXML, StoragePoolSource } from '../libvirt-xml-create.js';
 import { parsePoolCapabilities, parseStoragePoolDumpxml } from '../libvirt-xml-parse.js';
 import { storageVolumeGetAll } from './storageVolume.js';
 import { DBusProps, get_boolean_prop, get_variant_boolean, call, Enum, timeout } from './helpers.js';
@@ -56,7 +56,7 @@ export async function storagePoolCreate({
     connectionName: ConnectionName,
     name: string,
     type: string,
-    source: string,
+    source: StoragePoolSource,
     target: string,
     autostart: boolean,
 }): Promise<void> {

@@ -501,7 +501,7 @@ export function findMatchingNodeDevices(hostdev: VMHostDevice, nodeDevices: Node
     return nodeDevs;
 }
 
-interface BootOrderDevice {
+export interface BootOrderDevice {
     device: VMDisk | VMInterface | VMRedirectedDevice | VMHostDevice;
     type: "disk" | "network" | "redirdev" | "hostdev";
     bootOrder: number | undefined;

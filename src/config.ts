@@ -17,13 +17,29 @@
  * along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type { JsonValue } from "cockpit";
+import {
+    get,
+    import_json_object, import_record, import_array,
+    import_number, import_boolean, import_string,
+} from "import-json";
+
 import { read_os_release } from "os-release";
 import { get_manifest_config_matchlist } from "utils";
 
-/**
- * Application-wide constants
- */
-const VMS_CONFIG = {
+interface VmsConnectionConfig {
+    params: string[];
+}
+
+interface VmsConfig {
+    DefaultRefreshInterval: number;
+    DummyVmsWaitInterval: number;
+    WaitForRetryInstallVm: number;
+    Virsh: { connections: Record<string, VmsConnectionConfig> }; // XXX - only used in one place
+    StorageMigrationSupported: boolean;
+}
+
+const VMS_CONFIG: VmsConfig = {
     DefaultRefreshInterval: 10000, // in ms
     DummyVmsWaitInterval: 10 * 60 * 1000, // show dummy vms for max 10 minutes; to let virt-install do work before getting vm from virsh
     WaitForRetryInstallVm: 3 * 1000, // wait for vm to recover in the ui after failed install to show the error
@@ -41,15 +57,35 @@ const VMS_CONFIG = {
     StorageMigrationSupported: true,
 };
 
+function import_VmsConnectionConfig(val: JsonValue): VmsConnectionConfig {
+    const obj = import_json_object(val);
+    return {
+        params: get(obj, "params", val => import_array(val, import_string))
+    };
+}
+
+function import_Virsh(val: JsonValue): VmsConfig["Virsh"] {
+    const obj = import_json_object(val);
+    return {
+        connections: get(obj, "connections", val => import_record(val, import_VmsConnectionConfig))
+    };
+}
+
 export async function load_config() {
     const os_release = await read_os_release();
     const matches = [os_release.PLATFORM_ID, os_release.ID];
 
-    for (const key in VMS_CONFIG) {
-        const val = get_manifest_config_matchlist("machines", key, undefined, matches);
-        if (val !== undefined)
-            VMS_CONFIG[key] = val;
+    function import_config<K extends keyof VmsConfig>(key: K, importer: (val: JsonValue) => VmsConfig[K]): void {
+        const val = get_manifest_config_matchlist("machines", key, null, matches);
+        if (val !== null)
+            VMS_CONFIG[key] = importer(val);
     }
+
+    import_config("DefaultRefreshInterval", import_number);
+    import_config("DummyVmsWaitInterval", import_number);
+    import_config("WaitForRetryInstallVm", import_number);
+    import_config("Virsh", import_Virsh);
+    import_config("StorageMigrationSupported", import_boolean);
 }
 
 export default VMS_CONFIG;

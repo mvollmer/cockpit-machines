@@ -1,17 +1,55 @@
-import { getDoc, getSingleOptionalElem } from './libvirt-xml-parse.js';
-import { getNextAvailableTarget, logDebug } from './helpers.js';
+/*
+ * This file is part of Cockpit.
+ *
+ * Copyright (C) 2021 Red Hat, Inc.
+ *
+ * Cockpit is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * Cockpit is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
+ */
 
-export function changeMedia({ domXml, target, eject, file, pool, volume }) {
+import type {
+    VMDisk, VMInterface, VMRedirectedDevice,
+    VMHostDeviceUsb, VMHostDevicePci, VMHostDeviceScsi, VMHostDeviceScsiHost, VMHostDeviceMdev,
+} from './types';
+
+import { getDoc, getSingleOptionalElem } from './libvirt-xml-parse.js';
+import { getNextAvailableTarget, logDebug, BootOrderDevice } from './helpers.js';
+
+export function changeMedia({
+    domXml,
+    target,
+    eject,
+    file,
+    pool,
+    volume
+} : {
+    domXml: string,
+    target: string,
+    eject: boolean,
+    file: string,
+    pool: string,
+    volume: string,
+}): string {
     const s = new XMLSerializer();
     const doc = getDoc(domXml);
     const domainElem = doc.firstElementChild;
     if (!domainElem)
-        throw new Error("updateBootOrder: domXML has no domain element");
+        throw new Error("changeMedia: domXML has no domain element");
 
     const deviceElem = domainElem.getElementsByTagName("devices")[0];
     const disks = deviceElem.getElementsByTagName("disk");
 
-    let deviceXml;
+    let deviceXml: Node | undefined;
     for (let i = 0; i < disks.length; i++) {
         const disk = disks[i];
         const diskTarget = disk.getElementsByTagName("target")[0].getAttribute("dev");
@@ -39,15 +77,31 @@ export function changeMedia({ domXml, target, eject, file, pool, volume }) {
         }
     }
 
-    return s.serializeToString(deviceXml);
+    return deviceXml ? s.serializeToString(deviceXml) : domXml;
 }
 
-export function updateDisk({ domXml, diskTarget, readonly, shareable, busType, existingTargets, cache }) {
+export function updateDisk({
+    domXml,
+    diskTarget,
+    readonly,
+    shareable,
+    busType,
+    existingTargets,
+    cache
+} : {
+    domXml: string,
+    diskTarget: string,
+    readonly: boolean,
+    shareable: boolean,
+    busType: string,
+    existingTargets: string[],
+    cache: string,
+}): string {
     const s = new XMLSerializer();
     const doc = getDoc(domXml);
     const domainElem = doc.firstElementChild;
     if (!domainElem)
-        return Promise.reject(new Error("updateBootOrder: domXML has no domain element"));
+        throw new Error("updateBootOrder: domXML has no domain element");
 
     const deviceElem = domainElem.getElementsByTagName("devices")[0];
     const disks = deviceElem.getElementsByTagName("disk");
@@ -77,10 +131,13 @@ export function updateDisk({ domXml, diskTarget, readonly, shareable, busType, e
             if (busType && oldBusType !== busType) {
                 targetElem.setAttribute("bus", busType);
                 const newTarget = getNextAvailableTarget(existingTargets, busType);
+                if (!newTarget)
+                    throw new Error("updateBootOrder: no free target");
                 targetElem.setAttribute("dev", newTarget);
 
                 const addressElem = getSingleOptionalElem(disk, "address");
-                addressElem.remove();
+                if (addressElem)
+                    addressElem.remove();
             }
 
             const driverElem = disk.getElementsByTagName("driver")[0];
@@ -92,7 +149,7 @@ export function updateDisk({ domXml, diskTarget, readonly, shareable, busType, e
     return s.serializeToString(doc);
 }
 
-export function updateBootOrder(domXml, devices) {
+export function updateBootOrder(domXml: string, devices: BootOrderDevice[]) {
     const s = new XMLSerializer();
     const doc = getDoc(domXml);
     const domainElem = doc.firstElementChild;
@@ -116,7 +173,7 @@ export function updateBootOrder(domXml, devices) {
     for (let i = 0; i < disks.length; i++) {
         const disk = disks[i];
         const target = disk.getElementsByTagName("target")[0].getAttribute("dev");
-        const index = devices.findIndex(t => t.device.target === target);
+        const index = devices.findIndex(t => (t.device as VMDisk).target === target);
 
         let bootElem = getSingleOptionalElem(disk, "boot");
         if (index >= 0) { // it will have bootorder
@@ -124,7 +181,7 @@ export function updateBootOrder(domXml, devices) {
                 bootElem = doc.createElement("boot");
                 disk.appendChild(bootElem);
             }
-            bootElem.setAttribute("order", index + 1);
+            bootElem.setAttribute("order", String(index + 1));
         } else {
             if (bootElem) // it's has boot order, but it's ought to not have one, so we delete it
                 bootElem.remove();
@@ -135,7 +192,7 @@ export function updateBootOrder(domXml, devices) {
     for (let i = 0; i < interfaces.length; i++) {
         const iface = interfaces[i];
         const mac = iface.getElementsByTagName("mac")[0].getAttribute("address");
-        const index = devices.findIndex(t => t.device.mac === mac);
+        const index = devices.findIndex(t => (t.device as VMInterface).mac === mac);
 
         let bootElem = getSingleOptionalElem(iface, "boot");
         if (index >= 0) { // it will have bootorder
@@ -143,7 +200,7 @@ export function updateBootOrder(domXml, devices) {
                 bootElem = doc.createElement("boot");
                 iface.appendChild(bootElem);
             }
-            bootElem.setAttribute("order", index + 1);
+            bootElem.setAttribute("order", String(index + 1));
         } else {
             if (bootElem) // it's has boot order, but it's ought to not have one, so we delete it
                 bootElem.remove();
@@ -154,7 +211,7 @@ export function updateBootOrder(domXml, devices) {
     for (let i = 0; i < redirdevs.length; i++) {
         const redirdev = redirdevs[i];
         const port = redirdev.getElementsByTagName("address")[0].getAttribute("port");
-        const index = devices.findIndex(t => t.device.address?.port === port);
+        const index = devices.findIndex(t => (t.device as VMRedirectedDevice).address?.port === port);
 
         let bootElem = getSingleOptionalElem(redirdev, "boot");
         if (index >= 0) { // it will have bootorder
@@ -162,7 +219,7 @@ export function updateBootOrder(domXml, devices) {
                 bootElem = doc.createElement("boot");
                 redirdev.appendChild(bootElem);
             }
-            bootElem.setAttribute("order", index + 1);
+            bootElem.setAttribute("order", String(index + 1));
         } else {
             if (bootElem) // it's has boot order, but it's ought to not have one, so we delete it
                 bootElem.remove();
@@ -187,8 +244,9 @@ export function updateBootOrder(domXml, devices) {
                 const productId = productElem.getAttribute('id');
 
                 index = devices.findIndex(t => {
-                    if (t.device.source.vendor && t.device.source.product)
-                        return t.device.source.vendor.id === vendorId && t.device.source.product.id === productId;
+                    const d = t.device as VMHostDeviceUsb;
+                    if (d.source.vendor && d.source.product)
+                        return d.source.vendor.id === vendorId && d.source.product.id === productId;
                     else
                         return false;
                 });
@@ -196,8 +254,9 @@ export function updateBootOrder(domXml, devices) {
                 const port = addressElem.getAttribute('port');
 
                 index = devices.findIndex(t => {
-                    if (t.device.source.address)
-                        return t.device.address.port === port;
+                    const d = t.device as VMHostDeviceUsb;
+                    if (d.address)
+                        return d.address.port === port;
                     else
                         return false;
                 });
@@ -211,11 +270,12 @@ export function updateBootOrder(domXml, devices) {
             const func = addressElem.getAttribute('function');
 
             index = devices.findIndex(t => {
-                if (t.device.source.address)
-                    return t.device.source.address.domain === domain &&
-                           t.device.source.address.bus === bus &&
-                           t.device.source.address.slot === slot &&
-                           t.device.source.address.func === func;
+                const d = t.device as VMHostDevicePci;
+                if (d.source.address)
+                    return d.source.address.domain === domain &&
+                           d.source.address.bus === bus &&
+                           d.source.address.slot === slot &&
+                           d.source.address.func === func;
                 else
                     return false;
             });
@@ -223,8 +283,8 @@ export function updateBootOrder(domXml, devices) {
             const addressElem = getSingleOptionalElem(sourceElem, "address");
             const adapterElem = getSingleOptionalElem(sourceElem, "adapter");
 
-            const protocol = addressElem.getAttribute('protocol');
-            const name = addressElem.getAttribute('name');
+            const protocol = addressElem?.getAttribute('protocol');
+            const name = addressElem?.getAttribute('name');
 
             if (addressElem && adapterElem) {
                 const bus = addressElem.getAttribute('bus');
@@ -233,19 +293,21 @@ export function updateBootOrder(domXml, devices) {
                 const adapterName = adapterElem.getAttribute('name');
 
                 index = devices.findIndex(t => {
-                    if (t.device.source.address && t.device.source.adapter)
-                        return t.device.source.address.bus === bus &&
-                               t.device.source.address.target === target &&
-                               t.device.source.address.unit === unit &&
-                               t.device.source.adapter.adapterName === adapterName;
+                    const d = t.device as VMHostDeviceScsi;
+                    if (d.source.address && d.source.adapter)
+                        return d.source.address.bus === bus &&
+                               d.source.address.target === target &&
+                               d.source.address.unit === unit &&
+                               d.source.adapter.name === adapterName;
                     else
                         return false;
                 });
             } else if (protocol && name) {
                 index = devices.findIndex(t => {
-                    if (t.device.source.address)
-                        return t.device.source.protocol === protocol &&
-                               t.device.source.name === name;
+                    const d = t.device as VMHostDeviceScsi;
+                    if (d.source.address)
+                        return d.source.protocol === protocol &&
+                               d.source.name === name;
                     else
                         return false;
                 });
@@ -254,26 +316,30 @@ export function updateBootOrder(domXml, devices) {
             const wwpn = sourceElem.getAttribute('wwpn');
             const protocol = sourceElem.getAttribute('protocol');
 
-            index = devices.findIndex(t => t.device.source.wwpn === wwpn &&
-                                           t.device.source.protocol === protocol);
+            index = devices.findIndex(t => {
+                const d = t.device as VMHostDeviceScsiHost;
+                return (d.source.wwpn === wwpn &&
+                        d.source.protocol === protocol);
+            });
         } else if (type === "mdev") {
             const addressElem = hostdev.getElementsByTagName("address")[0];
             const uuid = addressElem.getAttribute('uuid');
 
             index = devices.findIndex(t => {
-                if (t.device.source.address)
-                    return t.device.source.address.uuid === uuid;
+                const d = t.device as VMHostDeviceMdev;
+                if (d.source.address)
+                    return d.source.address.uuid === uuid;
                 else
                     return false;
             });
         }
 
-        if (index >= 0) { // it will have bootorder
+        if (index && index >= 0) { // it will have bootorder
             if (!bootElem) {
                 bootElem = doc.createElement("boot");
                 hostdev.appendChild(bootElem);
             }
-            bootElem.setAttribute("order", index + 1);
+            bootElem.setAttribute("order", String(index + 1));
         } else {
             if (bootElem) // it's has boot order, but it's ought to not have one, so we delete it
                 bootElem.remove();
@@ -286,27 +352,28 @@ export function updateBootOrder(domXml, devices) {
 /*
  * This function is used to define only offline attribute of memory.
  */
-export function updateMaxMemory(domXml, maxMemory) {
+export function updateMaxMemory(domXml: string, maxMemory: number) {
     const doc = getDoc(domXml);
     const domainElem = doc.firstElementChild;
     const s = new XMLSerializer();
 
-    const memElem = domainElem.getElementsByTagName("memory")[0];
-    memElem.textContent = `${maxMemory}`;
+    const memElem = domainElem?.getElementsByTagName("memory")[0];
+    if (memElem)
+        memElem.textContent = `${maxMemory}`;
 
     return s.serializeToString(doc);
 }
 
-function xmlGetXPath(doc, xpath) {
+function xmlGetXPath(doc: XMLDocument, xpath: string): Element[] {
     const elements = [];
     let node = null;
     const iterator = doc.evaluate(xpath, doc);
     while ((node = iterator.iterateNext()))
         elements.push(node);
-    return elements;
+    return elements as Element[];
 }
 
-export function replaceSpice(domXml) {
+export function replaceSpice(domXml: string) {
     // this implements https://access.redhat.com/solutions/6955095
     logDebug("replaceSpice original XML:", domXml);
 
@@ -323,7 +390,7 @@ export function replaceSpice(domXml) {
             const removeAttrs = [];
             for (let i = 0; i < model.attributes.length; i++) {
                 const attr = model.attributes.item(i);
-                if (attr.name !== "primary")
+                if (attr && attr.name !== "primary")
                     removeAttrs.push(attr.name);
             }
             removeAttrs.forEach(attr => model.removeAttribute(attr));

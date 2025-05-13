@@ -17,7 +17,19 @@
  * along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function getDiskXML(type, file, device, poolName, volumeName, format, target, cacheMode, shareable, busType, serial) {
+export function getDiskXML(
+    type: string,
+    file: string | undefined,
+    device: string,
+    poolName: string,
+    volumeName: string,
+    format: string,
+    target: string,
+    cacheMode: string,
+    shareable: boolean | undefined,
+    busType: string,
+    serial: string,
+): string {
     const doc = document.implementation.createDocument('', '', null);
 
     const diskElem = doc.createElement('disk');
@@ -34,7 +46,7 @@ export function getDiskXML(type, file, device, poolName, volumeName, format, tar
 
     const sourceElem = doc.createElement('source');
     if (type === 'file') {
-        sourceElem.setAttribute('file', file);
+        sourceElem.setAttribute('file', file!);
     } else {
         sourceElem.setAttribute('volume', volumeName);
         sourceElem.setAttribute('pool', poolName);
@@ -62,7 +74,31 @@ export function getDiskXML(type, file, device, poolName, volumeName, format, tar
     return new XMLSerializer().serializeToString(doc.documentElement);
 }
 
-export function getNetworkXML({ name, forwardMode, device, ipv4, netmask, ipv6, prefix, ipv4DhcpRangeStart, ipv4DhcpRangeEnd, ipv6DhcpRangeStart, ipv6DhcpRangeEnd }) {
+export function getNetworkXML({
+    name,
+    forwardMode,
+    device,
+    ipv4,
+    netmask,
+    ipv6,
+    prefix,
+    ipv4DhcpRangeStart,
+    ipv4DhcpRangeEnd,
+    ipv6DhcpRangeStart,
+    ipv6DhcpRangeEnd
+} : {
+    name: string,
+    forwardMode: string,
+    device: string,
+    ipv4: string,
+    netmask: string,
+    ipv6: string,
+    prefix: string,
+    ipv4DhcpRangeStart: string,
+    ipv4DhcpRangeEnd: string,
+    ipv6DhcpRangeStart: string,
+    ipv6DhcpRangeEnd: string,
+}) {
     const doc = document.implementation.createDocument('', '', null);
 
     const networkElem = doc.createElement('network');
@@ -140,7 +176,11 @@ export function getNetworkXML({ name, forwardMode, device, ipv4, netmask, ipv6, 
     return new XMLSerializer().serializeToString(doc.documentElement);
 }
 
-export function getVolumeXML(volumeName, size, format) {
+export function getVolumeXML(
+    volumeName: string,
+    size: string,
+    format: string,
+) {
     const doc = document.implementation.createDocument('', '', null);
 
     const volElem = doc.createElement('volume');
@@ -170,7 +210,26 @@ export function getVolumeXML(volumeName, size, format) {
     return new XMLSerializer().serializeToString(doc.documentElement);
 }
 
-export function getPoolXML({ name, type, source, target }) {
+export interface StoragePoolSource {
+    dir?: string;
+    device?: string;
+    name?: string;
+    host?: string;
+    initiator?: string;
+    format?: string;
+}
+
+export function getPoolXML({
+    name,
+    type,
+    source,
+    target
+} : {
+    name: string,
+    type: string,
+    source: StoragePoolSource,
+    target: string,
+}) {
     const doc = document.implementation.createDocument('', '', null);
 
     const poolElem = doc.createElement('pool');
@@ -236,7 +295,11 @@ export function getPoolXML({ name, type, source, target }) {
 }
 
 // see https://libvirt.org/formatsnapshot.html
-export function getSnapshotXML(name, description, memoryPath) {
+export function getSnapshotXML(
+    name?: string,
+    description?: string,
+    memoryPath?: string,
+) {
     const doc = document.implementation.createDocument('', '', null);
 
     const snapElem = doc.createElement('domainsnapshot');

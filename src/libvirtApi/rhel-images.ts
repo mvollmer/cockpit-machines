@@ -19,8 +19,13 @@
 
 import * as python from "python.js";
 
+// @ts-expect-error: magic verbatim string import, not a JS module
 import downloadRhelImageScript from '../scripts/rhsm/download_file_and_report_progress.py';
+
+// @ts-expect-error: magic verbatim string import, not a JS module
 import getRhelImageUrlScript from '../scripts/rhsm/get_rhel_image_url.py';
+
+// @ts-expect-error: magic verbatim string import, not a JS module
 import getAccessTokenScript from '../scripts/rhsm/get_access_token.py';
 
 import {
@@ -32,34 +37,48 @@ import {
  * See https://access.redhat.com/management/api/rhsm
  */
 
-export function downloadRhelImage(accessToken, url, fileName, downloadDir, isSystem) {
+export function downloadRhelImage(
+    accessToken: string,
+    url: string,
+    fileName: string,
+    downloadDir: string,
+    isSystem: boolean
+) {
     logDebug(`Download rhel image: ${url}, ${fileName}, ${downloadDir}, ${isSystem}`);
 
-    const args = JSON.stringify({
+    const arg = JSON.stringify({
         accessToken,
         url,
         fileName,
         downloadDir
     });
 
-    return python.spawn(downloadRhelImageScript, args, { err: "message", superuser: isSystem && "require", environ: ['LC_ALL=C.UTF-8'] });
+    return python.spawn(downloadRhelImageScript, [arg], {
+        err: "message",
+        ...(isSystem ? { superuser: "require" } : { }),
+        environ: ['LC_ALL=C.UTF-8']
+    });
 }
 
-export function getAccessToken(offlineToken) {
+export function getAccessToken(offlineToken: string) {
     logDebug(`Get access token`);
 
-    const args = JSON.stringify({ offlineToken });
-    return python.spawn(getAccessTokenScript, args, { err: "message", environ: ['LC_ALL=C.UTF-8'] });
+    const arg = JSON.stringify({ offlineToken });
+    return python.spawn(getAccessTokenScript, [arg], { err: "message", environ: ['LC_ALL=C.UTF-8'] });
 }
 
-export function getRhelImageUrl(accessToken, rhelVersion, arch) {
+export function getRhelImageUrl(
+    accessToken: string,
+    rhelVersion: string,
+    arch: string
+) {
     logDebug(`Download rhel image, ${rhelVersion}, ${arch}`);
 
-    const args = JSON.stringify({
+    const arg = JSON.stringify({
         accessToken,
         rhelVersion,
         arch,
     });
 
-    return python.spawn(getRhelImageUrlScript, args, { err: "message", environ: ['LC_ALL=C.UTF-8'] });
+    return python.spawn(getRhelImageUrlScript, [arg], { err: "message", environ: ['LC_ALL=C.UTF-8'] });
 }
