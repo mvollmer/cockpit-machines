@@ -33,7 +33,6 @@ import type {
     ConnectionName, VM,
 } from './types';
 
-// @ts-expect-error: magic verbatim string import, not a JS module
 import installVmScript from '../scripts/install_machine.py';
 
 import {

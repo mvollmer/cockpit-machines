@@ -25,7 +25,6 @@ import cockpit from "cockpit";
 import store from "../store.js";
 import * as python from "python.js";
 
-// @ts-expect-error: magic verbatim string import, not a JS module
 import getOSListScript from "../getOSList.py";
 
 import {
