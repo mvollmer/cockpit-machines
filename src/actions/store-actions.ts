@@ -48,6 +48,7 @@ import type {
     Network,
     NodeInterface,
     NodeDevice,
+    HypervisorCapabilities,
 } from '../libvirtApi/types';
 
 /**
@@ -100,7 +101,7 @@ export function setNodeMaxMemory({
 export function setCapabilities({
     capabilities
 } : {
-    capabilities: unknown
+    capabilities: HypervisorCapabilities
 }) {
     return {
         type: SET_CAPABILITIES,

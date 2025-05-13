@@ -46,7 +46,7 @@ import {
     UPDATE_VM,
 } from './constants/store-action-types.js';
 
-import type { VM, NodeDevice, NodeInterface, StoragePool, Network } from './libvirtApi/types';
+import type { VM, NodeDevice, NodeInterface, StoragePool, Network, HypervisorCapabilities } from './libvirtApi/types';
 
 // --- helpers -------------------
 function getFirstIndexOfResource(state, field, value, connectionName) {
@@ -71,8 +71,8 @@ interface StateWithProvider<S> {
 
 interface Config extends StateWithProvider<unknown> {
     refreshInterval: number;
-    nodeMaxMemory?: unknown;
-    capabilities?: unknown;
+    nodeMaxMemory?: number;
+    capabilities?: HypervisorCapabilities;
 }
 
 function config(state: Config | undefined, action): Config {
