@@ -32,7 +32,7 @@ import type {
 import { updateOrAddNetwork } from '../actions/store-actions.js';
 import { getNetworkXML } from '../libvirt-xml-create.js';
 import { parseNetDumpxml } from '../libvirt-xml-parse.js';
-import { DBusProps, DBusVariant, call, timeout, Enum } from './helpers.js';
+import { DBusProps, get_string_prop, get_boolean_prop, call, timeout, Enum } from './helpers.js';
 
 export function networkActivate({
     connectionName,
@@ -151,13 +151,13 @@ export async function networkGet({
             * of the properties got fetched from libvirt. Make sure that there is check before reading the attributes.
             */
         if ("Active" in resultProps)
-            props.active = (resultProps.Active.v as DBusVariant).v as boolean;
+            props.active = get_boolean_prop(resultProps, "Active");
         if ("Persistent" in resultProps)
-            props.persistent = (resultProps.Persistent.v as DBusVariant).v as boolean;
+            props.persistent = get_boolean_prop(resultProps, "Persistent");
         if ("Autostart" in resultProps)
-            props.autostart = (resultProps.Autostart.v as DBusVariant).v as boolean;
+            props.autostart = get_boolean_prop(resultProps, "Autostart");
         if ("Name" in resultProps)
-            props.name = (resultProps.Name.v as DBusVariant).v as string;
+            props.name = get_string_prop(resultProps, "Name");
 
         const [xml] = await call<[string]>(connectionName, objPath, 'org.libvirt.Network', 'GetXMLDesc', [0], { timeout, type: 'u' });
         const network = parseNetDumpxml(xml);

@@ -81,7 +81,7 @@ import {
 import { storagePoolRefresh } from './storagePool.js';
 import { snapshotGetAll } from './snapshot.js';
 import { downloadRhelImage, getRhelImageUrl } from './rhel-images.js';
-import { DBusProps, DBusVariant, call, Enum, timeout, resolveUiState } from './helpers.js';
+import { DBusProps, get_string_prop, get_boolean_prop, call, Enum, timeout, resolveUiState } from './helpers.js';
 import { CLOUD_IMAGE, DOWNLOAD_AN_OS, LOCAL_INSTALL_MEDIA_SOURCE, needsRHToken } from "../components/create-vm-dialog/createVmDialogUtils.js";
 
 export const domainCanConsole = (vmState) => vmState == 'running';
@@ -648,11 +648,11 @@ export async function domainGet({
         * of the properties got fetched from libvirt. Make sure that there is check before reading the attributes.
         */
         if ("Name" in returnProps)
-            props.name = (returnProps.Name.v as DBusVariant).v as string;
+            props.name = get_string_prop(returnProps, "Name");
         if ("Persistent" in returnProps)
-            props.persistent = (returnProps.Persistent.v as DBusVariant).v as boolean;
+            props.persistent = get_boolean_prop(returnProps, "Persistent");
         if ("Autostart" in returnProps)
-            props.autostart = (returnProps.Autostart.v as DBusVariant).v as boolean;
+            props.autostart = get_boolean_prop(returnProps, "Autostart");
         props.ui = resolveUiState(props.name, connectionName);
 
         const dumpxmlParams = parseDomainDumpxml(connectionName, domainXML, objPath);

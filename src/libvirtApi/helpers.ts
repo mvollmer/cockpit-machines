@@ -17,7 +17,7 @@
  * along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
  */
 
-import cockpit from 'cockpit';
+import cockpit, { Variant } from 'cockpit';
 import store from '../store.js';
 
 import { logDebug } from '../helpers.js';
@@ -116,6 +116,8 @@ export const Enum = {
 };
 
 /* Slightly improved type for cockpit.DBusClient.
+
+   XXX - move that to pkg/lib/cockpit.d.ts
  */
 
 interface DBusClientAdditions {
@@ -130,19 +132,54 @@ interface DBusClientAdditions {
 
 export type DBusClient = cockpit.DBusClient & DBusClientAdditions;
 
-/* Utility types for the result of the Properties.GetAll call.
-   (There is cockpit.Variant, but it can't be nested.)
+/* Utilities for DBus variants.
  */
 
-export type DBusType = string | Uint8Array | number | boolean | DBusType[] | { t: string; v: DBusType };
+export function get_variant_string(val: Variant): string {
+    if (val.t != "s")
+        throw new Error(`Must be a string but has signature ${val.t}`);
+    return val.v as string;
+}
 
-export interface DBusVariant {
-    t: string;
-    v: DBusType;
+export function get_variant_number(val: Variant): number {
+    if (!"ynqiuxtd".includes(val.t))
+        throw new Error(`Must be a number but has signature ${val.t}`);
+    return val.v as number;
+}
+
+export function get_variant_boolean(val: Variant): boolean {
+    if (val.t != "b")
+        throw new Error(`Must be a boolean but has signature ${val.t}`);
+    return val.v as boolean;
+}
+
+export function get_variant_variant(val: Variant): Variant {
+    if (val.t != "v")
+        throw new Error(`Must be a variant but has signature ${val.t}`);
+    return val.v as Variant;
 }
 
 export interface DBusProps {
-    [_: string]: DBusVariant;
+    [_: string]: Variant;
+}
+
+function get_prop(props: DBusProps, name: string): Variant {
+    const p = props[name];
+    if (!p)
+        throw new Error(`Property ${name} is missing`);
+    return p;
+}
+
+export function get_string_prop(props: DBusProps, name: string): string {
+    return get_variant_string(get_variant_variant(get_prop(props, name)));
+}
+
+export function get_number_prop(props: DBusProps, name: string): number {
+    return get_variant_number(get_variant_variant(get_prop(props, name)));
+}
+
+export function get_boolean_prop(props: DBusProps, name: string): boolean {
+    return get_variant_boolean(get_variant_variant(get_prop(props, name)));
 }
 
 /**

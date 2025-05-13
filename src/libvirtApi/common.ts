@@ -53,7 +53,9 @@ import {
 } from "../libvirtApi/domain.js";
 import {
     DBusProps,
-    DBusVariant,
+    get_number_prop,
+    get_string_prop,
+    get_variant_number,
     call,
     dbusClient,
     Enum,
@@ -89,7 +91,7 @@ function calculateDiskStats(info: DBusProps): VM["disksStats"] {
 
     if (!("block.count" in info))
         return;
-    const count = (info["block.count"].v as DBusVariant).v as number;
+    const count = get_number_prop(info, "block.count");
     if (!count)
         return;
 
@@ -103,11 +105,11 @@ function calculateDiskStats(info: DBusProps): VM["disksStats"] {
      */
 
     function get_stat(name: string) {
-        return info[name] === undefined ? NaN : (info[name].v as DBusVariant).v.toString();
+        return info[name] === undefined ? NaN : get_number_prop(info, name).toString();
     }
 
     for (let i = 0; i < count; i++) {
-        const target = (info[`block.${i}.name`].v as DBusVariant).v as string;
+        const target = get_string_prop(info, `block.${i}.name`);
         const physical = get_stat(`block.${i}.physical`);
         const capacity = get_stat(`block.${i}.capacity`);
         const allocation = get_stat(`block.${i}.allocation`);
@@ -122,6 +124,9 @@ function calculateDiskStats(info: DBusProps): VM["disksStats"] {
             console.warn(`calculateDiskStats(): mandatory property is missing in info (block.${i}.name)`);
         }
     }
+
+    console.log("STATS", disksStats);
+
     return disksStats;
 }
 
@@ -185,16 +190,16 @@ async function doUsagePolling(
             let avgvCpuTime = 0;
 
             if ("balloon.rss" in info)
-                props.rssMemory = (info["balloon.rss"].v as DBusVariant).v as number;
-            else if ("state.state" in info && (info["state.state"].v as DBusVariant).v as number == Enum.VIR_DOMAIN_SHUTOFF)
+                props.rssMemory = get_number_prop(info, "balloon.rss");
+            else if ("state.state" in info && get_number_prop(info, "state.state") == Enum.VIR_DOMAIN_SHUTOFF)
                 props.rssMemory = 0.0;
-            for (let i = 0; i < ((info["vcpu.maximum"].v as DBusVariant).v as number); i++) {
+            for (let i = 0; i < get_number_prop(info, "vcpu.maximum"); i++) {
                 if (!(`vcpu.${i}.time` in info))
                     continue;
-                avgvCpuTime += (info[`vcpu.${i}.time`].v as DBusVariant).v as number;
+                avgvCpuTime += get_number_prop(info, `vcpu.${i}.time`);
             }
-            avgvCpuTime /= (info["vcpu.current"].v as DBusVariant).v as number;
-            if (((info["vcpu.current"].v as DBusVariant).v as number) > 0) {
+            avgvCpuTime /= get_number_prop(info, "vcpu.current");
+            if (get_number_prop(info, "vcpu.current") > 0) {
                 props.actualTimeInMs = Date.now();
                 props.cpuTime = avgvCpuTime;
             }
@@ -221,8 +226,8 @@ export async function getLibvirtVersion({
 } : {
     connectionName: ConnectionName
 }): Promise<void> {
-    const [version] = await call<[DBusVariant]>(connectionName, "/org/libvirt/QEMU", "org.freedesktop.DBus.Properties", "Get", ["org.libvirt.Connect", "LibVersion"], { timeout, type: "ss" });
-    store.dispatch(updateLibvirtVersion({ libvirtVersion: version.v as string }));
+    const [version] = await call<[cockpit.Variant]>(connectionName, "/org/libvirt/QEMU", "org.freedesktop.DBus.Properties", "Get", ["org.libvirt.Connect", "LibVersion"], { timeout, type: "ss" });
+    store.dispatch(updateLibvirtVersion({ libvirtVersion: get_variant_number(version) }));
 }
 
 async function getCapabilities({

@@ -176,7 +176,7 @@ export function undefineVm({
 export function updateLibvirtVersion({
     libvirtVersion
 } : {
-    libvirtVersion: string
+    libvirtVersion: number
 }) {
     return {
         type: UPDATE_LIBVIRT_VERSION,

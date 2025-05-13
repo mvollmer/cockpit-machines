@@ -33,7 +33,7 @@ import { updateOrAddStoragePool } from '../actions/store-actions.js';
 import { getPoolXML } from '../libvirt-xml-create.js';
 import { parsePoolCapabilities, parseStoragePoolDumpxml } from '../libvirt-xml-parse.js';
 import { storageVolumeGetAll } from './storageVolume.js';
-import { DBusProps, DBusVariant, call, Enum, timeout } from './helpers.js';
+import { DBusProps, get_boolean_prop, get_variant_boolean, call, Enum, timeout } from './helpers.js';
 
 export function storagePoolActivate({
     connectionName,
@@ -113,11 +113,11 @@ export async function storagePoolGet({
             * of the properties got fetched from libvirt. Make sure that there is check before reading the attributes.
             */
         if ("Active" in resultProps)
-            props.active = (resultProps.Active.v as DBusVariant).v as boolean;
+            props.active = get_boolean_prop(resultProps, "Active");
         if ("Persistent" in resultProps)
-            props.persistent = (resultProps.Persistent.v as DBusVariant).v as boolean;
+            props.persistent = get_boolean_prop(resultProps, "Persistent");
         if ("Autostart" in resultProps)
-            props.autostart = (resultProps.Autostart.v as DBusVariant).v as boolean;
+            props.autostart = get_boolean_prop(resultProps, "Autostart");
 
         props.volumes = [];
         if (props.active) {
@@ -141,9 +141,9 @@ export async function storagePoolGetAll({
             connectionName, '/org/libvirt/QEMU', 'org.libvirt.Connect', 'ListStoragePools', [0],
             { timeout, type: 'u' });
         return await Promise.all(objPaths.map(async path => {
-            const [active] = await call<[DBusVariant]>(connectionName, path, 'org.freedesktop.DBus.Properties', 'Get',
-                                                       ['org.libvirt.StoragePool', 'Active'], { timeout, type: 'ss' });
-            if (active.v as boolean)
+            const [active] = await call<[cockpit.Variant]>(connectionName, path, 'org.freedesktop.DBus.Properties', 'Get',
+                                                           ['org.libvirt.StoragePool', 'Active'], { timeout, type: 'ss' });
+            if (get_variant_boolean(active))
                 return storagePoolRefresh({ connectionName, objPath: path });
             else
                 return storagePoolGet({ connectionName, id: path });
