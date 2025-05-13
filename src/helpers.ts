@@ -131,13 +131,13 @@ function convertToUnitVerbose(input: unknown, inputUnit: string | Unit, outputUn
         unit: units.B.name,
     };
 
-    const _input = Number(input);
-    if (isNaN(_input)) {
+    const parsed_input = Number(input);
+    if (isNaN(parsed_input)) {
         console.error('input is not a number');
         return result;
     }
 
-    if (_input < 0) {
+    if (parsed_input < 0) {
         console.error(`input == ${input} cannot be less than zero`);
         return result;
     }
@@ -152,9 +152,9 @@ function convertToUnitVerbose(input: unknown, inputUnit: string | Unit, outputUn
 
     const exponentDiff = inUnit.base1024Exponent - outUnit.base1024Exponent;
     if (exponentDiff < 0) {
-        result.value = _input / getPowerOf1024(-1 * exponentDiff);
+        result.value = parsed_input / getPowerOf1024(-1 * exponentDiff);
     } else {
-        result.value = _input * getPowerOf1024(exponentDiff);
+        result.value = parsed_input * getPowerOf1024(exponentDiff);
     }
     result.unit = outUnit.name;
 
@@ -554,7 +554,7 @@ export function getBootOrderDevices(vm: VM): BootOrderDevice[] {
         }
     }
 
-    function to_num(str: optString): number | undefined {
+    function to_optNumber(str: optString): number | undefined {
         return str ? Number(str) : undefined;
     }
 
@@ -565,7 +565,7 @@ export function getBootOrderDevices(vm: VM): BootOrderDevice[] {
 
         devices.push({
             device: disk,
-            bootOrder: to_num(disk.bootOrder),
+            bootOrder: to_optNumber(disk.bootOrder),
             type: "disk"
         });
     }
@@ -577,7 +577,7 @@ export function getBootOrderDevices(vm: VM): BootOrderDevice[] {
 
         devices.push({
             device: iface,
-            bootOrder: to_num(iface.bootOrder),
+            bootOrder: to_optNumber(iface.bootOrder),
             type: "network"
         });
     }
@@ -587,7 +587,7 @@ export function getBootOrderDevices(vm: VM): BootOrderDevice[] {
             .forEach(redirdev => {
                 devices.push({
                     device: redirdev,
-                    bootOrder: to_num(redirdev.bootOrder),
+                    bootOrder: to_optNumber(redirdev.bootOrder),
                     type: "redirdev"
                 });
             });
@@ -597,7 +597,7 @@ export function getBootOrderDevices(vm: VM): BootOrderDevice[] {
             .forEach(hostdev => {
                 devices.push({
                     device: hostdev,
-                    bootOrder: to_num(hostdev.bootOrder),
+                    bootOrder: to_optNumber(hostdev.bootOrder),
                     type: "hostdev"
                 });
             });
