@@ -46,7 +46,7 @@ import {
     UPDATE_VM,
 } from './constants/store-action-types.js';
 
-import type { VM, NodeDevice, Interface, StoragePool, Network } from './libvirtApi/types';
+import type { VM, NodeDevice, NodeInterface, StoragePool, Network } from './libvirtApi/types';
 
 // --- helpers -------------------
 function getFirstIndexOfResource(state, field, value, connectionName) {
@@ -124,7 +124,7 @@ function lazyComposedReducer<T, S>({
     };
 }
 
-function interfaces(state: Interface[] | undefined, action): Interface[] {
+function interfaces(state: NodeInterface[] | undefined, action): NodeInterface[] {
     state = state || [];
 
     switch (action.type) {

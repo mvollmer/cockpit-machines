@@ -570,7 +570,7 @@ export interface NodeDevice extends NodeDeviceXML {
 
 /** Interface **/
 
-export interface Interface {
+export interface NodeInterface {
     name: string;
     MAC: string;
     Active: boolean;

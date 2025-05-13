@@ -46,7 +46,7 @@ import type {
     VMSnapshot,
     StoragePool,
     Network,
-    Interface,
+    NodeInterface,
     NodeDevice,
 } from '../libvirtApi/types';
 
@@ -203,7 +203,7 @@ export function updateDomainSnapshots({
     };
 }
 
-export function updateOrAddInterface(props: Interface) {
+export function updateOrAddInterface(props: NodeInterface) {
     return {
         type: UPDATE_ADD_INTERFACE,
         payload: { iface: props },
