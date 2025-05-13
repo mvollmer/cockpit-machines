@@ -49,7 +49,7 @@ import type {
     NodeInterface,
     NodeDevice,
     HypervisorCapabilities,
-} from '../libvirtApi/types';
+} from '../types';
 
 /**
  * All actions dispatchable by in the application

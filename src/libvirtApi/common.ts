@@ -79,7 +79,7 @@ import {
     parseDumpxmlForCapabilities
 } from "../libvirt-xml-parse.js";
 
-import type { ConnectionName, VM } from './types';
+import type { ConnectionName, VM } from '../types';
 
 /**
  * Calculates disk statistics.

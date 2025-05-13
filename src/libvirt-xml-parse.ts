@@ -37,7 +37,7 @@ import type {
     NetworkXML, NetworkIp, NetworkDhcpHost,
 
     NodeDeviceXML, NodeDeviceCapability,
-} from './libvirtApi/types';
+} from './types';
 
 import {
     convertToUnit,

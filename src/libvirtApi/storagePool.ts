@@ -27,7 +27,7 @@ import store from '../store.js';
 import type {
     ConnectionName,
     StoragePool, StoragePoolCapabilites
-} from './types';
+} from '../types';
 
 import { updateOrAddStoragePool } from '../actions/store-actions.js';
 import { getPoolXML } from '../libvirt-xml-create.js';

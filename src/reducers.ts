@@ -46,7 +46,7 @@ import {
     UPDATE_VM,
 } from './constants/store-action-types.js';
 
-import type { VM, NodeDevice, NodeInterface, StoragePool, Network, HypervisorCapabilities } from './libvirtApi/types';
+import type { VM, NodeDevice, NodeInterface, StoragePool, Network, HypervisorCapabilities } from './types';
 
 // --- helpers -------------------
 function getFirstIndexOfResource(state, field, value, connectionName) {

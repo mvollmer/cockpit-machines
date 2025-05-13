@@ -26,7 +26,7 @@ import {
     optString,
     ConnectionName,
     VM,
-} from './types';
+} from '../types';
 
 import {
     removeVmCreateInProgress,

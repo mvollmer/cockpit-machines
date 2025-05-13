@@ -26,7 +26,7 @@ import store from '../store.js';
 import {
     ConnectionName,
     VM, VMSnapshot,
-} from './types';
+} from '../types';
 
 import { updateDomainSnapshots } from '../actions/store-actions.js';
 import { getSnapshotXML } from '../libvirt-xml-create.js';

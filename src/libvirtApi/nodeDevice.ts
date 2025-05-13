@@ -24,7 +24,7 @@
 import cockpit from 'cockpit';
 import store from '../store.js';
 
-import type { ConnectionName, NodeDevice } from './types';
+import type { ConnectionName, NodeDevice } from '../types';
 
 import { updateOrAddNodeDevice } from '../actions/store-actions.js';
 import { parseNodeDeviceDumpxml } from '../libvirt-xml-parse.js';

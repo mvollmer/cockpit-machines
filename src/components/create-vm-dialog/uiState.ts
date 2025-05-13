@@ -27,7 +27,7 @@ import {
 
 import VMS_CONFIG from "../../config.js";
 
-import type { ConnectionName } from '../../libvirtApi/types';
+import type { ConnectionName } from '../../types';
 
 const CREATE_TIMEOUT = 'CREATE_TIMEOUT';
 

@@ -26,7 +26,8 @@ import type {
     NodeDevice,
     StoragePool,
     HypervisorCapabilities,
-} from './libvirtApi/types';
+} from './types';
+
 import type {
     UIVMState
 } from './components/create-vm-dialog/uiState';

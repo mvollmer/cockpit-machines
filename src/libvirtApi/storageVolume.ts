@@ -26,7 +26,7 @@ import type {
     optString,
     ConnectionName,
     StorageVolume,
-} from './types';
+} from '../types';
 
 import { getVolumeXML } from '../libvirt-xml-create.js';
 import { parseStorageVolumeDumpxml } from '../libvirt-xml-parse.js';

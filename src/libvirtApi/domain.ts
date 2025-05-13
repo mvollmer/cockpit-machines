@@ -31,7 +31,7 @@ import VMS_CONFIG from '../config.js';
 
 import type {
     ConnectionName, VM,
-} from './types';
+} from '../types';
 
 import installVmScript from '../scripts/install_machine.py';
 

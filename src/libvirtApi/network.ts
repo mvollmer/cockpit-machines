@@ -27,7 +27,7 @@ import store from '../store.js';
 import type {
     ConnectionName,
     Network
-} from './types';
+} from '../types';
 
 import { updateOrAddNetwork } from '../actions/store-actions.js';
 import { getNetworkXML } from '../libvirt-xml-create.js';

@@ -25,7 +25,7 @@
  */
 
 import type store from './store.js';
-import type { ConnectionName } from './libvirtApi/types';
+import type { ConnectionName } from './types';
 
 export function getRefreshInterval(state: ReturnType<typeof store.getState>) {
     return state.config.refreshInterval;
