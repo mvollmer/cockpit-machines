@@ -20,7 +20,7 @@
 import cockpit from 'cockpit';
 import store from './store.js';
 import type {
-    opt_string,
+    optString,
     ConnectionName,
     VM, VMState, VMDisk, VMInterface, VMRedirectedDevice, VMHostDevice,
     NodeDevice,
@@ -554,7 +554,7 @@ export function getBootOrderDevices(vm: VM): BootOrderDevice[] {
         }
     }
 
-    function to_num(str: opt_string): number | undefined {
+    function to_num(str: optString): number | undefined {
         return str ? Number(str) : undefined;
     }
 
@@ -632,13 +632,13 @@ export function getSortedBootOrderDevices(vm: VM): BootOrderDevice[] {
 
 interface DiskMapVolume {
     type: "volume";
-    pool: opt_string;
-    volume: opt_string;
+    pool: optString;
+    volume: optString;
 }
 
 interface DiskMapFile {
     type: "file";
-    source: opt_string;
+    source: optString;
 }
 
 type DiskMap = DiskMapVolume | DiskMapFile;
@@ -669,7 +669,7 @@ function getVmDisksMap(vms: VM[], connectionName: ConnectionName) {
 /**
  * Returns a string which represent disk target of volume in VM using the said volume.
  */
-export function getStorageVolumeDiskTarget(vm: VM, storagePool: StoragePool, volumeName: string): opt_string {
+export function getStorageVolumeDiskTarget(vm: VM, storagePool: StoragePool, volumeName: string): optString {
     const disks = vm.disks || [];
     const targetPath = storagePool.target ? storagePool.target.path : '';
     const volumePath = targetPath + '/' + volumeName;
@@ -744,7 +744,7 @@ export function getNetworkDevices(): string[] {
     return uniq;
 }
 
-export function getDefaultVolumeFormat(pool: StoragePool): opt_string {
+export function getDefaultVolumeFormat(pool: StoragePool): optString {
     // For the valid volume format types for different pool types see https://libvirt.org/storage.html
     if (['disk'].indexOf(pool.type || "") > -1)
         return 'none';
@@ -850,17 +850,17 @@ export function getNodeDevSource(dev: NodeDevice): string | undefined {
 export type HostDevSourceObject =
 {
     // common
-    vendor: opt_string;
-    product: opt_string;
-    bus: opt_string;
+    vendor: optString;
+    product: optString;
+    bus: optString;
 
     // pci
-    domain?: opt_string;
-    slot?: opt_string;
-    func?: opt_string;
+    domain?: optString;
+    slot?: optString;
+    func?: optString;
 
     // usb
-    device?: opt_string;
+    device?: optString;
 }
 
 export function getHostDevSourceObject(dev: VMHostDevice): HostDevSourceObject | undefined {
@@ -899,7 +899,7 @@ export function nicLookupByMAC(interfacesList: VMInterface[], mac: string) {
     return interfacesList.filter(iface => iface.mac == mac)[0];
 }
 
-type SourceName = opt_string | { address: opt_string, port: opt_string };
+type SourceName = optString | { address: optString, port: optString };
 
 export function getIfaceSourceName(iface: VMInterface): SourceName {
     const mapper: Record<string, (source: VMInterface["source"]) => SourceName> = {

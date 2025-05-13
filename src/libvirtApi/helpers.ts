@@ -23,7 +23,7 @@ import store from '../store.js';
 import { logDebug } from '../helpers.js';
 
 import {
-    opt_string,
+    optString,
     ConnectionName,
     VM,
 } from './types';
@@ -177,7 +177,7 @@ export function dbusClient(connectionName: ConnectionName): DBusClient {
     return clientLibvirt[connectionName];
 }
 
-export function resolveUiState(name: opt_string, connectionName: ConnectionName) {
+export function resolveUiState(name: optString, connectionName: ConnectionName) {
     const result: VM["ui"] = {
         // used just the first time vm is shown
         initiallyExpanded: false,

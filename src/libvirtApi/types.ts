@@ -30,7 +30,7 @@
    as a first step, let's define a shorter name for this.
  */
 
-export type opt_string = string | null | undefined;
+export type optString = string | null | undefined;
 
 /** General **/
 
@@ -39,8 +39,8 @@ export type ConnectionName = "session" | "system";
 /** Capabilities **/
 
 export interface GuestCapabilities {
-    osType: opt_string;
-    arch: opt_string;
+    osType: optString;
+    arch: optString;
     features?: {
         diskSnapshot: boolean;
         externalSnapshot: boolean;
@@ -54,112 +54,112 @@ export interface HypervisorCapabilities {
 /** Virtual Machines **/
 
 export interface VMDisk {
-    target: opt_string;
+    target: optString;
     driver: {
-        name: opt_string;
-        type: opt_string;
-        cache: opt_string;
-        discard: opt_string;
-        io: opt_string;
-        errorPolicy: opt_string;
+        name: optString;
+        type: optString;
+        cache: optString;
+        discard: optString;
+        io: optString;
+        errorPolicy: optString;
     };
-    bootOrder: opt_string;
-    type: opt_string;
-    snapshot: opt_string;
-    device: opt_string;
+    bootOrder: optString;
+    type: optString;
+    snapshot: optString;
+    device: optString;
     source: {
-        file: opt_string;
-        dir: opt_string;
-        dev: opt_string;
-        pool: opt_string;
-        volume: opt_string;
-        protocol: opt_string;
-        name: opt_string;
+        file: optString;
+        dir: optString;
+        dev: optString;
+        pool: optString;
+        volume: optString;
+        protocol: optString;
+        name: optString;
         host: {
-            name: opt_string;
-            port: opt_string;
+            name: optString;
+            port: optString;
         },
-        startupPolicy: opt_string;
+        startupPolicy: optString;
     };
-    bus: opt_string;
-    serial: opt_string;
-    aliasName: opt_string;
+    bus: optString;
+    serial: optString;
+    aliasName: optString;
     readonly: boolean;
     shareable: boolean;
-    removable: opt_string;
+    removable: optString;
 }
 
 export interface VMInterface {
-    type: opt_string;
-    managed: opt_string;
-    name: opt_string;
-    target: opt_string;
-    mac: opt_string;
-    model: opt_string;
-    aliasName: opt_string;
-    virtualportType: opt_string;
-    driverName: opt_string;
-    state: opt_string;
-    mtu: opt_string;
-    bootOrder: opt_string;
+    type: optString;
+    managed: optString;
+    name: optString;
+    target: optString;
+    mac: optString;
+    model: optString;
+    aliasName: optString;
+    virtualportType: optString;
+    driverName: optString;
+    state: optString;
+    mtu: optString;
+    bootOrder: optString;
     source: {
-        bridge: opt_string;
-        network: opt_string;
-        portgroup: opt_string;
-        dev: opt_string;
-        mode: opt_string;
-        address: opt_string;
-        port: opt_string;
+        bridge: optString;
+        network: optString;
+        portgroup: optString;
+        dev: optString;
+        mode: optString;
+        address: optString;
+        port: optString;
         local: {
-            address: opt_string;
-            port: opt_string;
+            address: optString;
+            port: optString;
         },
     },
     address: {
-        bus: opt_string;
-        function: opt_string;
-        slot: opt_string;
-        domain: opt_string;
+        bus: optString;
+        function: optString;
+        slot: optString;
+        domain: optString;
     },
 }
 
 export interface VMRedirectedDevice {
-    bus: opt_string;
-    type: opt_string;
-    bootOrder: opt_string;
+    bus: optString;
+    type: optString;
+    bootOrder: optString;
     address: {
-        type: opt_string;
-        bus: opt_string;
-        port: opt_string;
+        type: optString;
+        bus: optString;
+        port: optString;
     },
     source: {
-        mode: opt_string;
-        host: opt_string;
-        service: opt_string;
+        mode: optString;
+        host: optString;
+        service: optString;
     },
 }
 
 export interface VMHostDeviceBase {
     type: string;
-    bootOrder: opt_string;
-    mode: opt_string;
-    driver: opt_string;
+    bootOrder: optString;
+    mode: optString;
+    driver: optString;
 }
 
 export interface VMHostDeviceUsb extends VMHostDeviceBase {
     type: "usb";
     address: {
-        port: opt_string;
+        port: optString;
     };
     source: {
         vendor: {
-            id: opt_string;
+            id: optString;
         };
         product: {
-            id: opt_string;
+            id: optString;
         };
-        device: opt_string;
-        bus: opt_string;
+        device: optString;
+        bus: optString;
     };
 }
 
@@ -168,15 +168,15 @@ export interface VMHostDevicePci extends VMHostDeviceBase {
     source: {
         address: {
             vendor: {
-                id: opt_string;
+                id: optString;
             },
             product: {
-                id: opt_string;
+                id: optString;
             },
-            domain: opt_string;
-            bus: opt_string;
-            slot: opt_string;
-            func: opt_string;
+            domain: optString;
+            bus: optString;
+            slot: optString;
+            func: optString;
         };
     };
 }
@@ -184,15 +184,15 @@ export interface VMHostDevicePci extends VMHostDeviceBase {
 export interface VMHostDeviceScsi extends VMHostDeviceBase {
     type: "scsi";
     source: {
-        protocol: opt_string;
-        name: opt_string;
+        protocol: optString;
+        name: optString;
         address: {
-            bus: opt_string;
-            target: opt_string;
-            unit: opt_string;
+            bus: optString;
+            target: optString;
+            unit: optString;
         },
         adapter: {
-            name: opt_string;
+            name: optString;
         };
     };
 }
@@ -200,8 +200,8 @@ export interface VMHostDeviceScsi extends VMHostDeviceBase {
 export interface VMHostDeviceScsiHost extends VMHostDeviceBase {
     type: "scsi_host";
     source: {
-        protocol: opt_string;
-        wwpn: opt_string;
+        protocol: optString;
+        wwpn: optString;
     };
 }
 
@@ -209,7 +209,7 @@ export interface VMHostDeviceMdev extends VMHostDeviceBase {
     type: "mdev";
     source: {
         address: {
-            uuid: opt_string;
+            uuid: optString;
         };
     };
 }
@@ -217,21 +217,21 @@ export interface VMHostDeviceMdev extends VMHostDeviceBase {
 export interface VMHostDeviceStorage extends VMHostDeviceBase {
     type: "storage";
     source: {
-        block: opt_string;
+        block: optString;
     };
 }
 
 export interface VMHostDeviceMisc extends VMHostDeviceBase {
     type: "misc";
     source: {
-        char: opt_string;
+        char: optString;
     };
 }
 
 export interface VMHostDeviceNet extends VMHostDeviceBase {
     type: "net";
     source: {
-        interface: opt_string;
+        interface: optString;
     };
 }
 
@@ -251,80 +251,80 @@ export interface VMOsBoot {
 }
 
 export interface VMCpu {
-    mode?: opt_string;
-    model?: opt_string;
+    mode?: optString;
+    model?: optString;
     topology: {
-        sockets?: opt_string;
-        threads?: opt_string;
-        cores?: opt_string;
+        sockets?: optString;
+        threads?: optString;
+        cores?: optString;
     };
 }
 
 export interface VMVcpus {
-    count: opt_string;
-    placement: opt_string;
-    max: opt_string;
+    count: optString;
+    placement: optString;
+    max: optString;
 }
 
 export interface VMGraphics {
-    type: opt_string;
-    port: opt_string;
-    tlsPort: opt_string;
-    address: opt_string;
-    password: opt_string;
-    autoport: opt_string;
+    type: optString;
+    port: optString;
+    tlsPort: optString;
+    address: optString;
+    password: optString;
+    autoport: optString;
 }
 
 export interface VMPty {
     type: "pty";
-    alias: opt_string;
+    alias: optString;
 }
 
 export type VMConsole = VMGraphics | VMPty;
 
 export interface VMFilesystem {
-    accessmode: opt_string;
+    accessmode: optString;
     readonly: boolean;
     source: {
-        dir: opt_string;
-        name: opt_string;
-        socket: opt_string;
-        file: opt_string;
+        dir: optString;
+        name: optString;
+        socket: optString;
+        file: optString;
     },
     target: {
-        dir: opt_string;
+        dir: optString;
     },
 }
 
 export interface VMWatchdog {
-    model?: opt_string;
-    action?: opt_string;
+    model?: optString;
+    action?: optString;
 }
 
 export interface VMVsock {
     cid: {
-        auto?: opt_string;
-        address?: opt_string;
+        auto?: optString;
+        address?: optString;
     };
 }
 
 export interface VMMetadata {
     hasInstallPhase: boolean;
-    installSourceType: opt_string;
-    installSource: opt_string;
-    osVariant: opt_string;
-    rootPassword: opt_string;
-    userLogin: opt_string;
-    userPassword: opt_string;
+    installSourceType: optString;
+    installSource: optString;
+    osVariant: optString;
+    rootPassword: optString;
+    userLogin: optString;
+    userPassword: optString;
 }
 
 export interface VMSnapshot {
-    name: opt_string,
-    description: opt_string,
-    state: opt_string,
-    creationTime: opt_string,
-    parentName: opt_string,
-    memoryPath: opt_string,
+    name: optString,
+    description: optString,
+    state: optString,
+    creationTime: optString,
+    parentName: optString,
+    memoryPath: optString,
     isCurrent?: boolean,
 }
 
@@ -332,20 +332,20 @@ export interface VMXML {
     connectionName: ConnectionName;
     uuid: string;
     name: string;
-    description: opt_string;
+    description: optString;
     id: string;
 
-    osType: opt_string;
+    osType: optString;
     osBoot: VMOsBoot[];
-    firmware: opt_string;
-    loader: opt_string;
-    arch: opt_string;
+    firmware: optString;
+    loader: optString;
+    arch: optString;
     currentMemory: number,
     memory: number;
     memoryBacking: boolean;
     vcpus: VMVcpus,
     disks: Record<string, VMDisk>;
-    emulatedMachine: opt_string;
+    emulatedMachine: optString;
     cpu: VMCpu;
     displays: VMConsole[];
     interfaces: VMInterface[];
@@ -396,10 +396,10 @@ export interface VM extends VMXML {
 
     capabilities: {
         loaderElems: HTMLCollection | undefined;
-        maxVcpu: opt_string;
-        cpuModels: null | (opt_string)[];
-        cpuHostModel: opt_string;
-        supportedDiskBusTypes: null | (opt_string)[];
+        maxVcpu: optString;
+        cpuModels: null | (optString)[];
+        cpuHostModel: optString;
+        supportedDiskBusTypes: null | (optString)[];
         supportsSpice: boolean;
         supportsTPM: boolean;
     };
@@ -416,41 +416,41 @@ export interface VM extends VMXML {
 
 export interface StorageVolume {
     connectionName: ConnectionName;
-    id: opt_string;
+    id: optString;
     name: string;
-    type: opt_string;
-    path: opt_string;
-    capacity: opt_string;
-    allocation: opt_string;
-    physical: opt_string | number;
-    format: opt_string;
+    type: optString;
+    path: optString;
+    capacity: optString;
+    allocation: optString;
+    physical: optString | number;
+    format: optString;
 }
 
 export interface StoragePool {
     connectionName: ConnectionName;
     id: string;
-    type: opt_string;
-    name: opt_string;
-    uuid: opt_string;
-    capacity: opt_string;
-    available: opt_string;
-    allocation: opt_string;
+    type: optString;
+    name: optString;
+    uuid: optString;
+    capacity: optString;
+    available: optString;
+    allocation: optString;
     target?: {
-        path: opt_string;
+        path: optString;
     };
     source?: {
         host?: {
-            name: opt_string;
+            name: optString;
         };
         device?: {
-            path: opt_string;
+            path: optString;
         };
         dir?: {
-            path: opt_string;
+            path: optString;
         };
-        name?: opt_string;
+        name?: optString;
         format?: {
-            type: opt_string;
+            type: optString;
         };
     };
     active?: boolean;
@@ -459,45 +459,45 @@ export interface StoragePool {
     volumes?: StorageVolume[] | undefined;
 }
 
-export type StoragePoolCapabilites = Record<string, { supported: opt_string}>;
+export type StoragePoolCapabilites = Record<string, { supported: optString}>;
 
 /** Networks **/
 
 export interface NetworkDhcpHost {
-    ip: opt_string;
-    name: opt_string;
-    mac: opt_string;
-    id: opt_string;
+    ip: optString;
+    name: optString;
+    mac: optString;
+    id: optString;
 }
 
 export interface NetworkIp {
-    address: opt_string;
-    family: opt_string;
-    netmask: opt_string;
-    prefix: opt_string;
+    address: optString;
+    family: optString;
+    netmask: optString;
+    prefix: optString;
     dhcp: {
         range: {
-            start: opt_string;
-            end: opt_string;
+            start: optString;
+            end: optString;
         },
         hosts: NetworkDhcpHost[];
-        bootp: { file: opt_string; } | undefined;
+        bootp: { file: optString; } | undefined;
     };
 }
 
 export interface NetworkXML {
-    uuid: opt_string;
+    uuid: optString;
     bridge?: {
-        name: opt_string;
+        name: optString;
     };
     ip: NetworkIp[];
-    mtu: opt_string;
+    mtu: optString;
     forward?: {
         mode: string;
     };
     interface?: {
         interface: {
-            dev: opt_string;
+            dev: optString;
         };
     };
 }
@@ -514,49 +514,49 @@ export interface Network extends NetworkXML {
 /** Node Devices **/
 
 export interface NodeDeviceCapability {
-    type?: opt_string;
+    type?: optString;
 
     // type == 'net'
-    interface?: opt_string;
+    interface?: optString;
 
     // type == 'storage'
-    block?: opt_string;
+    block?: optString;
 
     // type == 'misc'
-    char?: opt_string;
+    char?: optString;
 
     // type == 'usb_device' or 'pci'
     product?: {
-        id?: opt_string;
-        _value?: opt_string;
+        id?: optString;
+        _value?: optString;
     };
     vendor?: {
-        id?: opt_string;
-        _value?: opt_string;
+        id?: optString;
+        _value?: optString;
     };
-    domain?: opt_string;
-    bus?: opt_string | { _value?: opt_string }; // latter from 'scsi'
-    function?: opt_string;
-    slot?: opt_string;
-    device?: opt_string;
+    domain?: optString;
+    bus?: optString | { _value?: optString }; // latter from 'scsi'
+    function?: optString;
+    slot?: optString;
+    device?: optString;
 
     // type == 'scsi'
     // see above for 'bus'
-    lun?: { _value?: opt_string };
-    target?: { _value?: opt_string };
+    lun?: { _value?: optString };
+    target?: { _value?: optString };
 
     // type == 'scsi_host'
-    host?: { _value?: opt_string };
-    uniqueId?: { _value?: opt_string };
+    host?: { _value?: optString };
+    uniqueId?: { _value?: optString };
 
     // type == 'mdev'
-    uuid?: opt_string;
+    uuid?: optString;
 }
 
 export interface NodeDeviceXML {
-    name: opt_string;
-    path: opt_string;
-    parent: opt_string;
+    name: optString;
+    path: optString;
+    parent: optString;
     capability: NodeDeviceCapability;
 }
 

@@ -18,7 +18,7 @@
  */
 
 import type {
-    opt_string,
+    optString,
 
     ConnectionName,
 
@@ -175,7 +175,7 @@ export function parsePoolCapabilities(capsXML: string): StoragePoolCapabilites {
     }, {});
 }
 
-export function getDomainCapMaxVCPU(capsXML: string): opt_string {
+export function getDomainCapMaxVCPU(capsXML: string): optString {
     const domainCapsElem = getElem(capsXML);
     const vcpuElem = domainCapsElem.getElementsByTagName("vcpu")?.[0];
     return vcpuElem && vcpuElem.getAttribute('max');
@@ -187,7 +187,7 @@ export function getDomainCapLoader(capsXML: string): HTMLCollection | undefined 
     return osElem && osElem.getElementsByTagName("loader");
 }
 
-export function getDomainCapCPUCustomModels(capsXML: string): null | opt_string[] {
+export function getDomainCapCPUCustomModels(capsXML: string): null | optString[] {
     const domainCapsElem = getElem(capsXML);
     const cpuElem = domainCapsElem.getElementsByTagName("cpu")?.[0];
     const modeElems = cpuElem && cpuElem.getElementsByTagName("mode");
@@ -195,7 +195,7 @@ export function getDomainCapCPUCustomModels(capsXML: string): null | opt_string[
     return customModeElem && Array.prototype.map.call(customModeElem.getElementsByTagName("model"), modelElem => modelElem.textContent);
 }
 
-export function getDomainCapCPUHostModel(capsXML: string): opt_string {
+export function getDomainCapCPUHostModel(capsXML: string): optString {
     const domainCapsElem = getElem(capsXML);
     const cpuElem = domainCapsElem.getElementsByTagName("cpu")?.[0];
     const modeElems = cpuElem && cpuElem.getElementsByTagName("mode");
@@ -203,7 +203,7 @@ export function getDomainCapCPUHostModel(capsXML: string): opt_string {
     return hostModelModeElem && Array.prototype.map.call(hostModelModeElem.getElementsByTagName("model"), modelElem => modelElem.textContent)[0];
 }
 
-export function getDomainCapDiskBusTypes(capsXML: string): null | opt_string[] {
+export function getDomainCapDiskBusTypes(capsXML: string): null | optString[] {
     const domainCapsElem = getElem(capsXML);
     const devicesCapsElem = domainCapsElem.getElementsByTagName("devices")?.[0];
     const diskCapsElem = devicesCapsElem?.getElementsByTagName("disk")?.[0];
@@ -920,7 +920,7 @@ export function parseDumpxmlForInterfaces(devicesElem: Element): VMInterface[] {
     return interfaces;
 }
 
-export function parseDumpxmlMachinesMetadataElement(metadataElem: Element | undefined, name: string): opt_string {
+export function parseDumpxmlMachinesMetadataElement(metadataElem: Element | undefined, name: string): optString {
     if (!metadataElem) {
         return null;
     }

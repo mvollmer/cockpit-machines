@@ -23,7 +23,7 @@
  */
 
 import type {
-    opt_string,
+    optString,
     ConnectionName,
     StorageVolume,
 } from './types';
@@ -110,7 +110,7 @@ export async function storageVolumeGetAll({
     poolName
 } : {
     connectionName: ConnectionName,
-    poolName: opt_string,
+    poolName: optString,
 }): Promise<StorageVolume[] | undefined> {
     try {
         const [storagePoolPath] = await call<[string]>(connectionName, '/org/libvirt/QEMU', 'org.libvirt.Connect', 'StoragePoolLookupByName',
