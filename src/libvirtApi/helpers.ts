@@ -115,23 +115,6 @@ export const Enum = {
     VIR_MIGRATE_OFFLINE: 1024,
 };
 
-/* Slightly improved type for cockpit.DBusClient.
-
-   XXX - move that to pkg/lib/cockpit.d.ts
- */
-
-interface DBusClientAdditions {
-    subscribe: (
-        match: {
-            interface?: string,
-            member?: string,
-        },
-        func: (path: string, iface: string, signal: string, args: unknown[]) => void,
-    ) => void;
-}
-
-export type DBusClient = cockpit.DBusClient & DBusClientAdditions;
-
 /* Utilities for DBus variants.
  */
 
@@ -200,15 +183,15 @@ export function call<R = void>(
 /**
  * Get Libvirt D-Bus client
  */
-export function dbusClient(connectionName: ConnectionName): DBusClient {
-    const clientLibvirt: Record<string, DBusClient> = {};
+export function dbusClient(connectionName: ConnectionName): cockpit.DBusClient {
+    const clientLibvirt: Record<string, cockpit.DBusClient> = {};
 
     if (!(connectionName in clientLibvirt) || clientLibvirt[connectionName] === null) {
         clientLibvirt[connectionName] = cockpit.dbus("org.libvirt",
                                                      {
                                                          bus: connectionName,
                                                          ...(connectionName === 'system' ? { superuser: "try" } : {})
-                                                     }) as DBusClient;
+                                                     });
     }
 
     return clientLibvirt[connectionName];
