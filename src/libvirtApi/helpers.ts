@@ -156,7 +156,7 @@ export function get_variant_boolean(val: Variant): boolean {
 export function get_variant_variant(val: Variant): Variant {
     if (val.t != "v")
         throw new Error(`Must be a variant but has signature ${val.t}`);
-    return val.v as Variant;
+    return val.v as unknown as Variant;
 }
 
 export interface DBusProps {
