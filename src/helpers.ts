@@ -25,7 +25,7 @@ import type {
     VM, VMState, VMDisk, VMInterface, VMRedirectedDevice, VMHostDevice,
     NodeDevice,
     StoragePool,
-    Capabilities,
+    HypervisorCapabilities,
 } from './libvirtApi/types';
 import type {
     UIVMState
@@ -925,7 +925,7 @@ export function getStoragePoolPath(storagePools: StoragePool[], poolName: string
     return pool?.target?.path;
 }
 
-export function vmSupportsExternalSnapshots(config: { capabilities?: Capabilities }, vm: VM): boolean {
+export function vmSupportsExternalSnapshots(config: { capabilities?: HypervisorCapabilities }, vm: VM): boolean {
     // External snapshot should only be used if the VM's os types/architecture allow it
     // and if snapshot features are present among guest capabilities:
     // https://libvirt.org/formatcaps.html#guest-capabilities

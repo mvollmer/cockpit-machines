@@ -22,7 +22,7 @@ import type {
 
     ConnectionName,
 
-    Capabilities, GuestCapabilities,
+    HypervisorCapabilities, GuestCapabilities,
 
     VMXML,
     VMOsBoot, VMCpu, VMVcpus, VMMetadata,
@@ -443,9 +443,9 @@ export function parseDumpxmlForConsoles(devicesElem: Element): VMConsole[] {
     return displays;
 }
 
-export function parseDumpxmlForCapabilities(capabilitiesXML: string): Capabilities {
+export function parseDumpxmlForCapabilities(capabilitiesXML: string): HypervisorCapabilities {
     const capabilitiesElem = getOptionalElem(capabilitiesXML);
-    const capabilities: Capabilities = { guests: [] };
+    const capabilities: HypervisorCapabilities = { guests: [] };
 
     if (capabilitiesElem) {
         const guestElems = capabilitiesElem.getElementsByTagName('guest');

@@ -47,7 +47,7 @@ export interface GuestCapabilities {
     };
 }
 
-export interface Capabilities {
+export interface HypervisorCapabilities {
     guests: GuestCapabilities[];
 }
 
