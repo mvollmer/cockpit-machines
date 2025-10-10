@@ -406,30 +406,25 @@ export function domainAttachDisk({
 }
 
 export function domainAttachHostDevices({
-    connectionName,
-    vmName,
+    vm,
     live,
     devices
 } : {
-    connectionName: ConnectionName,
-    vmName: string,
+    vm: VM,
     live: boolean,
     devices: NodeDevice[],
-}): cockpit.Spawn<string> {
-    const args = ["virt-xml", "-c", `qemu:///${connectionName}`, vmName];
+}): Promise<void> {
+    const actions: virtXmlAction[] = [];
 
     devices.forEach(dev => {
         const source = getNodeDevSource(dev);
         if (!source)
             return Promise.reject(new Error(`domainAttachHostDevices: could not determine device's source identifier`));
 
-        args.push("--add-device", "--hostdev", source);
+        actions.push({ action: "add-device", option: "hostdev", values: source });
     });
 
-    if (live)
-        args.push("--update");
-
-    return spawn(connectionName, args);
+    return runVirtXml(vm, actions, { update: live });
 }
 
 export async function domainChangeAutostart ({
