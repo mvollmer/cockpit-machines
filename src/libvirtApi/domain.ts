@@ -23,8 +23,6 @@ import type {
 } from '../types';
 import type { BootOrderDevice } from '../helpers.js';
 
-import installVmScript from '../scripts/install_machine.py';
-
 import {
     getDiskXML,
 } from '../libvirt-xml-create.js';
@@ -68,6 +66,48 @@ import { snapshotGetAll } from './snapshot.js';
 import { downloadRhelImage, getRhelImageUrl } from './rhel-images.js';
 import { DBusProps, get_boolean_prop, call, Enum, timeout } from './helpers.js';
 import { CLOUD_IMAGE, DOWNLOAD_AN_OS, LOCAL_INSTALL_MEDIA_SOURCE, needsRHToken } from "../components/create-vm-dialog/createVmDialogUtils.js";
+
+import installVmScript from '../scripts/install_machine.py';
+
+interface DomainCreateScriptArgs {
+    type: "create",
+    connectionName: ConnectionName,
+    vmName: string,
+
+    startVm: boolean,
+
+    os: string,
+    source: optString,
+    sourceType: optString,
+
+    memorySize: number,
+    storageSize: number,
+    storagePool: string,
+    storageVolume: optString,
+
+    unattended: boolean,
+    profile: string,
+    rootPassword: optString,
+    userLogin: optString,
+    userPassword: optString,
+    sshKeys: string[],
+    extraArguments: optString,
+}
+
+interface DomainInstallScriptArgs {
+    type: "install",
+    connectionName: ConnectionName,
+    vmName: string,
+
+    os: optString,
+    source: optString,
+    sourceType: optString,
+
+    rootPassword: optString,
+    userLogin: optString,
+    userPassword: optString,
+    extraArguments: optString,
+}
 
 export const domainCanInstall = (vmState: VMState, hasInstallPhase: boolean) => vmState != 'running' && hasInstallPhase;
 export const domainCanReset = (vmState: VMState) => vmState == 'running' || vmState == 'blocked' || vmState == 'paused';
@@ -476,25 +516,6 @@ export async function domainChangeBootOrder({
     await domainModifyXML(vm, doc => updateBootOrder(doc, devices));
 }
 
-interface DomainSpec {
-    memorySize: number,
-    os: string,
-    profile: string,
-    rootPassword: optString,
-    source: optString,
-    sourceType: string,
-    startVm: boolean,
-    storagePool: string,
-    storageSize: number,
-    storageVolume: optString,
-    unattended: boolean,
-    userLogin: optString,
-    userPassword: optString,
-    vmName: string,
-    sshKeys: string[],
-    extraArguments: optString,
-}
-
 export async function domainCreate({
     connectionName,
     memorySize,
@@ -515,17 +536,12 @@ export async function domainCreate({
     accessToken,
     sshKeys,
     extraArguments,
-} : {
-    connectionName: ConnectionName,
-    osVersion: string,
-    accessToken: optString
-} & DomainSpec): Promise<void> {
+} : Omit<DomainCreateScriptArgs, 'type'> & { osVersion: string, accessToken: optString }) : Promise<void> {
     // shows dummy vm until we get vm from virsh (cleans up inProgress)
     setVmCreateInProgress(vmName, connectionName);
 
-    type DomainCreateScriptArgs = { connectionName: ConnectionName, type: string } & DomainSpec;
-
     const args: DomainCreateScriptArgs = {
+        type: "create",
         connectionName,
         memorySize,
         os,
@@ -537,7 +553,6 @@ export async function domainCreate({
         storagePool,
         storageSize,
         storageVolume,
-        type: "create",
         unattended,
         userLogin,
         userPassword,
@@ -1007,22 +1022,22 @@ export async function domainInstall({ vm } : { vm: VM }): Promise<string> {
 
     appState.updateVm(vm, { installInProgress: true });
 
-    const args = JSON.stringify({
+    const args: DomainInstallScriptArgs = {
+        type: "install",
         connectionName: vm.connectionName,
-        os: vm.metadata.osVariant,
+        os: vm.metadata.osVariant || "",
         source: vm.metadata.installSource,
         sourceType: vm.metadata.installSourceType,
         rootPassword: vm.metadata.rootPassword,
         userLogin: vm.metadata.userLogin,
         userPassword: vm.metadata.userPassword,
         extraArguments: "", // XXX - get those also from metadata
-        type: "install",
         vmName: vm.name,
-    });
+    };
 
     return python.spawn(
         installVmScript,
-        [args],
+        [JSON.stringify(args)],
         {
             err: "message",
             environ: ['LC_ALL=C.UTF-8'],
