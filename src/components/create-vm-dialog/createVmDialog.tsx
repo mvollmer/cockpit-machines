@@ -79,7 +79,6 @@ import {
 } from 'cockpit/dialog';
 
 import {
-    FileAutoComplete,
     PasswordInput,
     DynamicList,
     DialogActionButton,
@@ -324,10 +323,14 @@ const Source = ({
             <DialogFileChooserInput
                 field={field.sub("source", update_source)}
                 label={_("Installation source")}
-                dialogTitle={_("Select ISO file")}
                 placeholder={_("Path to ISO file on host's file system")}
-                filters={iso_filters}
-                superuser="try"
+                fileChooserProps={
+                    {
+                        title: _("Select ISO file"),
+                        filters: iso_filters,
+                        superuser: "try",
+                    }
+                }
             />
         );
         break;
@@ -341,10 +344,14 @@ const Source = ({
             <DialogFileChooserInput
                 field={field.sub("source", update_source)}
                 label={_("Installation source")}
-                dialogTitle={_("Select cloud image")}
                 placeholder={_("Path to cloud image file on host's file system")}
-                filters={qcow2_filters}
-                superuser="try"
+                fileChooserProps={
+                    {
+                        title: _("Select cloud image"),
+                        filters: qcow2_filters,
+                        superuser: "try",
+                    }
+                }
             />
         );
         break;
@@ -358,10 +365,17 @@ const Source = ({
             <DialogFileChooserInput
                 field={field.sub("source", update_source)}
                 label={_("Disk image")}
-                dialogTitle={_("Select disk image")}
                 placeholder={_("Existing disk image on host's file system")}
-                filters={image_filters}
-                superuser="try"
+                fileChooserProps={
+                    {
+                        title: _("Select disk image"),
+                        filters: image_filters,
+                        shortcuts: [
+                            { label: _("Disk images"), path: "/var/lib/libvirt/images" },
+                        ],
+                        superuser: "try",
+                    }
+                }
             />
         );
         break;
