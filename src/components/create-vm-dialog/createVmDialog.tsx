@@ -316,7 +316,7 @@ const Source = ({
         break;
 
     case LOCAL_INSTALL_MEDIA_SOURCE:
-        const filters = [
+        const iso_filters = [
             regexFilter("ISO files", "\\.iso$")
         ];
 
@@ -326,28 +326,42 @@ const Source = ({
                 label={_("Installation source")}
                 dialogTitle={_("Select ISO file")}
                 placeholder={_("Path to ISO file on host's file system")}
-                filters={filters}
+                filters={iso_filters}
                 superuser="try"
             />
         );
         break;
 
     case CLOUD_IMAGE:
+        const qcow2_filters = [
+            regexFilter("QCOW2 files", "\\.qcow2$")
+        ];
+
         installationSource = (
-            <FileAutoComplete
-                    label={_("Installation source")}
-                    field={field.sub("source", update_source)}
-                    placeholder={_("Path to cloud image file on host's file system")}
+            <DialogFileChooserInput
+                field={field.sub("source", update_source)}
+                label={_("Installation source")}
+                dialogTitle={_("Select cloud image")}
+                placeholder={_("Path to cloud image file on host's file system")}
+                filters={qcow2_filters}
+                superuser="try"
             />
         );
         break;
 
     case EXISTING_DISK_IMAGE_SOURCE:
+        const image_filters = [
+            regexFilter("QCOW2 or RAW files", "\\.(qcow2|raw)$")
+        ];
+
         installationSource = (
-            <FileAutoComplete
-                    label={_("Disk image")}
-                    field={field.sub("source", update_source)}
-                    placeholder={_("Existing disk image on host's file system")}
+            <DialogFileChooserInput
+                field={field.sub("source", update_source)}
+                label={_("Disk image")}
+                dialogTitle={_("Select disk image")}
+                placeholder={_("Existing disk image on host's file system")}
+                filters={image_filters}
+                superuser="try"
             />
         );
         break;
@@ -401,7 +415,7 @@ const Source = ({
                         },
                         {
                             value: LOCAL_INSTALL_MEDIA_SOURCE,
-                            label: _("Local install media (ISO image or distro install tree)"),
+                            label: _("Local ISO install media"),
                         },
                         {
                             value: URL_SOURCE,
